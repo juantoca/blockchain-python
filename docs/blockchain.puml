@@ -5,6 +5,7 @@ class Blockchain {
     validate_chain(int [] blocks): boolean
     add_block(Block block): boolean
     get_last_hash(): String
+    chop(int i): None
     __len__(): int
     __getitem__(): Block
     __str__(): String
@@ -17,10 +18,10 @@ class Block{
     String hash
     verify_block(Block previous_hash): boolean
     get_content(): Content
-    hash(String previous_hash): String
+    hash(String previous_hash): Bytes
     set_header(String previous_hash)
     get_header(): String
-    set_index(int i)
+    set_index(int i): None
     __str__(): String
 }
 
@@ -30,6 +31,7 @@ class Content{
     Dict content
     set_content(String content, String key=None): None
     get_content(): A content
+    hash(): Bytes
     __str__(): String
 }
 

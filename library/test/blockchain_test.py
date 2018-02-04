@@ -1,7 +1,5 @@
-import sys
-sys.path.append("..")
 import unittest
-from blockchain.library.blockchain_data_type import Block, Blockchain
+from library.blockchain_data_type import Block, Blockchain
 
 
 class TestBlock(unittest.TestCase):

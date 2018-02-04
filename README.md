@@ -1,2 +1,2 @@
 # blockchain-python
-A testing blockchain implementation. Maybe a library itself in the future
+Yet another blockchain implementation. Aiming to create a general-purpose blockchain python library

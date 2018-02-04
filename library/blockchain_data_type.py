@@ -3,6 +3,7 @@ from json import dumps as dumps_json
 from json import loads as loads_json
 from pickle import dumps as dumps_pickle
 from pickle import loads as loads_pickle
+from time import time
 from copy import copy
 import pickle
 import io
@@ -22,13 +23,13 @@ class Content:
     def set_content(self, content) -> None:
         self.content = content
 
-    def hash(self):
-        return SHA3_256.new(bytes(str(self.content), "utf-8")).hexdigest()
+    def hash(self) -> bytes:
+        return SHA3_256.new(bytes(str(self.content), "utf-8")).digest()
 
     def __str__(self) -> str:
         return str(self.content)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.content)
 
 
@@ -36,30 +37,37 @@ class Block:
 
     def __init__(self, index=0, content=None):
         self.index = index
-        self.content = content
+        self.content: Content = content
+        self.timestamp = int(time())
         if not self.content:
             self.content = Content()
-        self.header = ""
+        self.header = b""
 
-    def set_header(self, header: str) -> None:
+    def set_header(self, header: bytes) -> None:
         """
         :param header: Actualiza la cabecera del bloque
         :return: None
         """
         self.header = header
 
-    def get_header(self) -> str:
+    def get_content(self) -> Content:
+        """
+        :return: Content object
+        """
+        return self.content
+
+    def get_header(self) -> bytes:
         """
         :return: Cabecera del bloque
         """
         return self.header
 
-    def hash(self, previous_hash: str) -> str:
+    def hash(self, previous_hash: bytes) -> bytes:
         """
         :param previous_hash: Hash del bloque anterior
         :return: Hash que debería tener la cabezera del bloque
         """
-        return SHA3_256.new(bytes(previous_hash, "utf-8") + self.content.hash().encode("utf-8")).hexdigest()
+        return SHA3_256.new(previous_hash + self.content.hash() + (self.timestamp).to_bytes(8, "big")).digest()
 
     def verify_block(self, previous_hash) -> bool:
         """
@@ -74,18 +82,25 @@ class Block:
     def set_index(self, i) -> None:
         self.index = i
 
+    def update_timestamp(self):
+        self.timestamp = int(time())
+
+    def get_timestamp(self):
+        return self.timestamp
+
     def __str__(self) -> str:
-        return str({"id": self.index, "hash": self.header, "content": str(self.content)})
+        return str({"id": self.index, "hash": self.header, "content": str(self.content), "timestamp": self.timestamp})
 
     def get_json(self):
         dic = copy(self.__dict__)
+        dic["header"] = self.header.hex()
         dic["content"] = dumps_pickle(self.content).hex()  # Hay que serializarlo de algún modo
         return dumps_json(dic)
 
     def load_from_json(self, json):
         json = loads_json(json)
         self.content = loads_pickle(bytearray.fromhex(json["content"]))
-        self.header = json["header"]
+        self.header = bytes.fromhex(json["header"])
 
 
 class Blockchain:
@@ -164,6 +179,7 @@ class Blockchain:
             returneo += str(x) + "\n"
         return returneo
 
+
 class RestrictedUnpickler(pickle.Unpickler):
 
     """
@@ -187,20 +203,23 @@ class RestrictedUnpickler(pickle.Unpickler):
             return getattr(sys.modules[module], name)
         raise pickle.UnpicklingError("global '%s.%s' is forbidden" % (module, name))
 
+    @staticmethod
     def add_class(cls):
         """
         :param cls: Clase a registrar
         """
         RestrictedUnpickler.allowed_classes[cls.__name__] = cls
 
+    @staticmethod
     def remove_class(cls):
         """
         :param cls: Clase a borrar
         """
         del RestrictedUnpickler.allowed_classes[cls.__name__]
 
+
 def restricted_loads(s):
-    """Helper function analogous to pickle.loads()."""
+    """Sustituto de pickle.loads()"""
     return RestrictedUnpickler(io.BytesIO(s)).load()
 
 
