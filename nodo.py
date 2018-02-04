@@ -226,7 +226,7 @@ class Server(socketserver.ThreadingTCPServer):
             self.chain = Blockchain()
 
         # Constantes
-        self.max_message_length = 1024*1024*32  # 1 MiB
+        self.max_message_length = 1024*1024*32  # 32 MiB
         self.client_timeout = 1  # Timeout del socket en cada petición
         self.goship_spanning = 2  # A cuantos nodos debo enviar la información en el protocolo de goship
         self.trial_add_node_on_register_timeout = 0.1
