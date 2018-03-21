@@ -1,7 +1,6 @@
 import unittest
 from library.blockchain_data_type import Block, Blockchain
 
-
 class TestBlock(unittest.TestCase):
 
     def test_block_integrity(self):

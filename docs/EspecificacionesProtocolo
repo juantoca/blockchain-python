@@ -1,6 +1,7 @@
 Si el comando no es reconocido, el servidor devolverá "INVALID_COMMAND"
 Si el mensaje es demasiado grande, el servidor devolverá "MESSAGE_OVERFLOW"
 Si el cliente no responde en el tiempo máximo, el servidor devolverá "TIMED_OUT"
+Si el mansaje recibido no cumple la prueba de trabajo, devolverá "INVALID_POW"
 
 Añadir bloque:"new_block (pickle.dumps(Block))"
     Devolverá:"FORMAT_ERROR", "SUCCESS", "INVALID_BLOCK", "TIMESTAMP_ERROR"
@@ -12,4 +13,4 @@ Registrar nodo:"register_node timestamp ip port"
     Devolverá:"SUCCESS", "INVALID_HOST", "FORMAT_ERROR"
 
 Añadir nodo:"add_node ip port"
-    Devolverá:""
+    Devolverá:"INVALID_HOST", "ALREADY_ADDED", "SUCCESS"

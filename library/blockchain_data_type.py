@@ -8,6 +8,7 @@ from copy import copy
 import pickle
 import io
 import sys
+from threading import Lock
 
 
 class Content:
@@ -110,6 +111,7 @@ class Blockchain:
         Constructor de la blockchain
         :param blocks: Lista de bloques
         """
+        self.add_block_lock = Lock()
         self.blocks = list(blocks)
 
     def __len__(self) -> int:
@@ -157,11 +159,12 @@ class Blockchain:
         :param block: Bloque a añadir
         :return: Se ha añadido el bloque?
         """
-        block.set_index(len(self))
-        if block.verify_block(self.get_last_hash()):
-            self.blocks.append(block)
-            return True
-        return False
+        with self.add_block_lock:  # Las escrituras en la blockchain deben ser secuenciales
+            block.set_index(len(self))
+            if block.verify_block(self.get_last_hash()):
+                self.blocks.append(block)
+                return True
+            return False
 
     def get_last_hash(self):
         """
