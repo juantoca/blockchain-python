@@ -221,7 +221,8 @@ class HiloPeticion(socketserver.BaseRequestHandler):
                     self.server.query_to(msg, *x, timeout=0, mine=False)
                 except (socket.error, BlockingIOError):
                     # Puede que el nodo nos haga un corte de manga, en tal caso no nos debemos enfadar
-                    # TODO Método para detectar un nodo desconectado y echarlo de la lista de nodos
+                    # TODO Método para detectar un nodo desconectado y echarlo de la lista de nodos.
+                    # ¿Sistema de prioridad en base a la disponibilidad pasada?
                     pass
             return True
 
